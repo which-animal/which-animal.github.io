@@ -1,0 +1,62 @@
+<div><h2>Upload Image</h2></div>
+
+
+<input type="file" onchange="onFileSelected(event)">
+<br><br>
+<img id="myimage" height="200">
+
+<br><br>
+
+<div id="label-container">
+    <div id="at">at:0</div>
+    <div id="kaplumbaga">kaplumbaga:0</div>
+    <div id="karinca">karinca:0</div>
+    <div id="kedi">kedi:0</div>
+    <div id="kopek">kopek:0</div>
+    <div id="tavsan">tavsan:0</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<script type="text/javascript">
+
+    const URL = "https://teachablemachine.withgoogle.com/models/LfRVERExa/";
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
+
+    async function onFileSelected(event) {
+        var selectedFile = event.target.files[0];
+        var reader = new FileReader();
+
+        var imgtag = document.getElementById("myimage");
+        imgtag.title = selectedFile.name;
+
+        reader.onload = function(event) {
+            imgtag.src = event.target.result;
+        };
+
+        reader.readAsDataURL(selectedFile);
+        
+        predictt();
+    }
+
+    async function predictt() {
+
+        let model = await tmImage.load(modelURL, metadataURL);
+        let maxPredictions = model.getTotalClasses();
+        
+        const image = document.getElementById('myimage');
+        let prediction = await model.predict(image);
+        console.log(prediction);
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = "";
+        
+        for (let i = 0; i < maxPredictions; i++) {
+            const className = prediction[i].className;
+            const probability = prediction[i].probability.toFixed(2);
+            labelContainer.innerHTML += `<div>${className}: ${probability}</div>`;
+        }
+        
+    }
+</script>
