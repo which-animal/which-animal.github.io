@@ -1,62 +1,121 @@
-<div><h2>Upload Image</h2></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Hangi Hayvansın</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:500,700&display=swap&subset=latin-ext" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600&display=swap&subset=latin-ext" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/fontawesome-all.css" rel="stylesheet">
+    <link href="css/swiper.css" rel="stylesheet">
+	<link href="css/styles.css" rel="stylesheet">
+	<link href="css/index.css" rel="stylesheet">
+    <link rel="icon" href="images/favicon.png">
+</head>
+<body data-spy="scroll" data-target=".fixed-top">
+    
+	<div class="spinner-wrapper">
+        <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top">
+        <a class="navbar-brand logo-text page-scroll" href="index.html">Hangi Hayvansın</a>
+        <!-- Mobile Menu Toggle Button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-awesome fas fa-bars"></span>
+            <span class="navbar-toggler-awesome fas fa-times"></span>
+        </button>
+        <!-- end of mobile menu toggle button -->
 
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link page-scroll" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-<input type="file" onchange="onFileSelected(event)">
-<br><br>
-<img id="myimage" height="200">
+    <!-- Joke -->
+    <header id="header" class="header">
+        <div class="header-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="text-container">
+                            <input type="file" onchange="onFileSelected(event)">
+                            <br><br>
+                            <img id="myimage" height="200">
+                            <br><br>
+                            <div id="label-container">
+                                <div id="at">at:0</div>
+                                <div id="kaplumbaga">kaplumbaga:0</div>
+                                <div id="karinca">karinca:0</div>
+                                <div id="kedi">kedi:0</div>
+                                <div id="kopek">kopek:0</div>
+                                <div id="tavsan">tavsan:0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- end of joke -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
-<br><br>
+    <script type="text/javascript">
 
-<div id="label-container">
-    <div id="at">at:0</div>
-    <div id="kaplumbaga">kaplumbaga:0</div>
-    <div id="karinca">karinca:0</div>
-    <div id="kedi">kedi:0</div>
-    <div id="kopek">kopek:0</div>
-    <div id="tavsan">tavsan:0</div>
-</div>
+        const URL = "https://teachablemachine.withgoogle.com/models/LfRVERExa/";
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+        async function onFileSelected(event) {
+            var selectedFile = event.target.files[0];
+            var reader = new FileReader();
 
-<script type="text/javascript">
+            var imgtag = document.getElementById("myimage");
+            imgtag.title = selectedFile.name;
 
-    const URL = "https://teachablemachine.withgoogle.com/models/LfRVERExa/";
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+            reader.onload = function(event) {
+                imgtag.src = event.target.result;
+            };
 
-    async function onFileSelected(event) {
-        var selectedFile = event.target.files[0];
-        var reader = new FileReader();
-
-        var imgtag = document.getElementById("myimage");
-        imgtag.title = selectedFile.name;
-
-        reader.onload = function(event) {
-            imgtag.src = event.target.result;
-        };
-
-        reader.readAsDataURL(selectedFile);
-        
-        predictt();
-    }
-
-    async function predictt() {
-
-        let model = await tmImage.load(modelURL, metadataURL);
-        let maxPredictions = model.getTotalClasses();
-        
-        const image = document.getElementById('myimage');
-        let prediction = await model.predict(image);
-        console.log(prediction);
-        labelContainer = document.getElementById("label-container");
-        labelContainer.innerHTML = "";
-        
-        for (let i = 0; i < maxPredictions; i++) {
-            const className = prediction[i].className;
-            const probability = prediction[i].probability.toFixed(2);
-            labelContainer.innerHTML += `<div>${className}: ${probability}</div>`;
+            reader.readAsDataURL(selectedFile);
+            
+            predictt();
         }
-        
-    }
-</script>
+
+        async function predictt() {
+
+            let model = await tmImage.load(modelURL, metadataURL);
+            let maxPredictions = model.getTotalClasses();
+            
+            const image = document.getElementById('myimage');
+            let prediction = await model.predict(image);
+            console.log(prediction);
+            labelContainer = document.getElementById("label-container");
+            labelContainer.innerHTML = "";
+            
+            for (let i = 0; i < maxPredictions; i++) {
+                const className = prediction[i].className;
+                const probability = prediction[i].probability.toFixed(2);
+                labelContainer.innerHTML += `<div>${className}: ${probability}</div>`;
+            }
+            
+        }
+    </script>
+
+
+
+    <!-- Scripts -->
+    <script src="js/jquery.min.js"></script> <!-- jQuery for Bootstrap's JavaScript plugins -->
+    <script src="js/scripts.js"></script> <!-- Custom scripts -->
+    <script src="js/index.js"></script> <!-- Joke scripts -->
+</body>
+</html>
